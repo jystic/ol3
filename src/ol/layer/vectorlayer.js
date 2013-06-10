@@ -340,7 +340,7 @@ ol.layer.Vector.prototype.parseFeatures = function(data, parser, projection) {
     'linestring': this.lineVertices_,
     'polygon': this.polygonVertices_,
     'multipoint': this.pointVertices_,
-    'multilinstring': this.lineVertices_,
+    'multilinestring': this.lineVertices_,
     'multipolygon': this.polygonVertices_
   };
 
