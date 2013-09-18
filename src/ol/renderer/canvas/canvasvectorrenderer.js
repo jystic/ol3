@@ -347,7 +347,7 @@ ol.renderer.canvas.VectorRenderer.prototype.renderPolygonFeatures_ =
       fillOpacity = symbolizer.fillOpacity,
       globalAlpha,
       i, ii, geometry, components, j, jj, poly,
-      rings, numRings, ring, dim, k, kk, vec, feature;
+      rings, r, numRings, ring, dim, k, kk, vec, feature;
 
   if (strokeColor) {
     context.strokeStyle = strokeColor;
@@ -366,7 +366,7 @@ ol.renderer.canvas.VectorRenderer.prototype.renderPolygonFeatures_ =
    * 1) stroke only, no holes - only need to have a single path
    * 2) fill only, no holes - only need to have a single path
    * 3) fill and stroke, no holes
-   * 4) holes - render polygon to sketch canvas first
+   * 4) holes
    */
   context.beginPath();
   for (i = 0, ii = features.length; i < ii; ++i) {
@@ -388,16 +388,19 @@ ol.renderer.canvas.VectorRenderer.prototype.renderPolygonFeatures_ =
       rings = poly.rings;
       numRings = rings.length;
       if (numRings > 0) {
-        // TODO: scenario 4
-        ring = rings[0];
-        for (k = 0, kk = ring.getCount(); k < kk; ++k) {
-          vec = [ring.get(k, 0), ring.get(k, 1), 0];
-          goog.vec.Mat4.multVec3(this.transform_, vec, vec);
-          if (k === 0) {
-            context.moveTo(vec[0], vec[1]);
-          } else {
-            context.lineTo(vec[0], vec[1]);
+        // scenario 4 - holes
+        for (r = 0; r < numRings; ++r) {
+          ring = rings[r];
+          for (k = 0, kk = ring.getCount(); k < kk; ++k) {
+            vec = [ring.get(k, 0), ring.get(k, 1), 0]
+            goog.vec.Mat4.multVec3(this.transform_, vec, vec);
+            if (k === 0) {
+              context.moveTo(vec[0], vec[1]);
+            } else {
+              context.lineTo(vec[0], vec[1]);
+            }
           }
+          context.closePath();
         }
         if (fillColor && strokeColor) {
           // scenario 3 - fill and stroke each time
